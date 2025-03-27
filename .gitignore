@@ -1,9 +1,0 @@
-.env
-
-/node_modules
-
-.vs_code
-
-.DB_Store
-
-package-lock.json
