@@ -31,6 +31,7 @@ Online kiyim-kechak dokoni uchun categoriyalar bo'yicha kiyimlarni ko'rish, ular
 - name
 - createdAt
 - updateAt
+- categoryId
 
 2. Clothes:
 
@@ -48,9 +49,7 @@ Online kiyim-kechak dokoni uchun categoriyalar bo'yicha kiyimlarni ko'rish, ular
 
 - id
 - name
-- email
 - phoneNumber
-- imageUrl
 - createAt
 - updateAt
 
