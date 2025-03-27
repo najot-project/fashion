@@ -6,6 +6,8 @@ const getAllUsers = async (_, res) => {
     try {
         const users = await userModel.find();
         res.status(200).json({ data: users, message: "All users fetched successfully" });
+        console.log("dhhdh");
+        
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
