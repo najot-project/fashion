@@ -1,9 +1,22 @@
 import Joi from "joi";
 
-export const userSchema = Joi.object({
-    username: Joi.string().min(3).max(30).required(),
-    phoneNumber: Joi.string().pattern(/^\+?\d{10,15}$/).required(),
-    password: Joi.string().min(8).required(),
-    createdAt: Joi.date().default(() => new Date(), "current date"),
-    updatedAt: Joi.date().default(() => new Date(), "current date"),
+export const registerUserSchema = Joi.object({
+  fullName: Joi.string().min(3).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+  phoneNumber: Joi.string().pattern(/^\+998\d{9}$/).required(),
+  gender: Joi.string().valid("male", "female").required(),
+  birthDate: Joi.date().less("now").required(),
+});
+
+export const loginUserSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+});
+
+export const updateUserSchema = Joi.object({
+  fullName: Joi.string().min(3).max(50),
+  email: Joi.string().email(),
+  phoneNumber: Joi.string().pattern(/^\+998\d{9}$/),
+  password: Joi.string().min(8),
 });
