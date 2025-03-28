@@ -1,25 +1,22 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import Joi from "joi";
 
-const userSchema = new Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-    },
-    phoneNumber: {
-      type: Number,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-  },
-  {
-    collection: "users",
-    timestamps: true,
-    versionKey: false,
-  }
-);
-export default mongoose.model("User", userSchema);
+export const registerUserSchema = Joi.object({
+  username: Joi.string().min(3).max(50).required(),
+  phoneNumber: Joi.string().pattern(/^\+998\d{9}$/).required(),
+  password: Joi.string().min(8).required(),
+  gender: Joi.string().valid("male", "female").required(),
+  birthDate: Joi.date().less("now").required(),
+});
+
+export const loginUserSchema = Joi.object({
+  phoneNumber: Joi.string().pattern(/^\+998\d{9}$/).required(),
+  password: Joi.string().min(8).required(),
+});
+
+export const updateUserSchema = Joi.object({
+  username: Joi.string().min(3).max(50),
+  phoneNumber: Joi.string().pattern(/^\+998\d{9}$/),
+  password: Joi.string().min(8),
+  gender: Joi.string().valid("male", "female"),
+  birthDate: Joi.date().less("now"),
+});
