@@ -19,7 +19,7 @@ userRouter.post(
 // Login route
 userRouter.post(
   "/login",
-  ValidationMiddleware(loginUserSchema), // You might want to create a specific schema for login validation
+  ValidationMiddleware(loginUserSchema),
   userController.login
 );
 
@@ -27,12 +27,15 @@ userRouter.post(
 userRouter.get("/", userController.getAllUsers);
 
 // Get user by ID
-userRouter.get("/:id", userController.getOneUser);
+userRouter.get(
+  "/:id",
+  userController.getOneUser
+);
 
 // Update user by ID
 userRouter.put(
   "/:id",
-  ValidationMiddleware(updateUserSchema), // Make sure updateUserSchema is correctly defined
+  ValidationMiddleware(updateUserSchema),
   userController.updateUser
 );
 
