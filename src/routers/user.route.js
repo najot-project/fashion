@@ -1,7 +1,11 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
 import { ValidationMiddleware } from "../middleware/validation.middleware.js";
-import { registerUserSchema, updateUserSchema } from "../schema/user.schema.js";
+import {
+  registerUserSchema,
+  updateUserSchema,
+  loginUserSchema,
+} from "../schema/user.schema.js";
 
 const userRouter = Router();
 
@@ -15,7 +19,7 @@ userRouter.post(
 // Login route
 userRouter.post(
   "/login",
-  ValidationMiddleware(registerUserSchema), // You might want to create a specific schema for login validation
+  ValidationMiddleware(loginUserSchema), // You might want to create a specific schema for login validation
   userController.login
 );
 

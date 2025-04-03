@@ -164,4 +164,10 @@ const deleteClothes = async (req, res) => {
   }
 };
 
-export default { getAllClothes, getOneClothes, createClothes, updateClothes, deleteClothes };
+export default {
+  getAllClothes,
+  getOneClothes,
+  createClothes,
+  updateClothes,
+  deleteClothes,
+};
