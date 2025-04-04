@@ -6,24 +6,32 @@ import {
   updateClothesSchema,
 } from "../schema/clothes.schema.js";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { Protected } from "../middleware/protected.middleware.js";
 
 const clothesRouter = Router();
 
 clothesRouter
-  .get("/", clothesController.getAllClothes)
-  .get("/:id", clothesController.getOneClothes)
+  .get("/", Protected(false), clothesController.getAllClothes)
+  .get("/:id", Protected(false), clothesController.getOneClothes)
   .post(
     "/",
+    Protected(true),
     authenticate,
     ValidationMiddleware(createClothesSchema),
     clothesController.createClothes
   )
   .patch(
     "/:id",
+    Protected(true),
     authenticate,
     ValidationMiddleware(updateClothesSchema),
     clothesController.updateClothes
   )
-  .delete("/:id", authenticate, clothesController.deleteClothes);
+  .delete(
+    "/:id",
+    Protected(true),
+    authenticate,
+    clothesController.deleteClothes
+  );
 
 export default clothesRouter;

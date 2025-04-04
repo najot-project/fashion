@@ -12,6 +12,7 @@ const userRouter = Router();
 // Register route
 userRouter.post(
   "/register",
+  Protected(false),
   ValidationMiddleware(registerUserSchema),
   userController.register
 );
@@ -19,24 +20,26 @@ userRouter.post(
 // Login route
 userRouter.post(
   "/login",
+  Protected(false),
   ValidationMiddleware(loginUserSchema), // You might want to create a specific schema for login validation
   userController.login
 );
 
 // Get all users
-userRouter.get("/", userController.getAllUsers);
+userRouter.get("/", Protected(false), userController.getAllUsers);
 
 // Get user by ID
-userRouter.get("/:id", userController.getOneUser);
+userRouter.get("/:id", Protected(false), userController.getOneUser);
 
 // Update user by ID
 userRouter.put(
   "/:id",
+  Protected(true),
   ValidationMiddleware(updateUserSchema), // Make sure updateUserSchema is correctly defined
   userController.updateUser
 );
 
 // Delete user by ID
-userRouter.delete("/:id", userController.deleteUser);
+userRouter.delete("/:id", Protected(true), userController.deleteUser);
 
 export default userRouter;
