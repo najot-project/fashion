@@ -7,10 +7,6 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    total_price: {
-      type: Number,
-      required: true,
-    },
     created_at: {
       type: Date,
       default: Date.now,
