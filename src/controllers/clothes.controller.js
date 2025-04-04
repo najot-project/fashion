@@ -1,8 +1,9 @@
 import { isValidObjectId } from "mongoose";
 import categoryModel from "../models/category.model.js";
 import clothesModel from "../models/clothes.model.js";
+import { BaseException } from "../exception/base.exception.js";
 
-const getAllClothes = async (req, res) => {
+const getAllClothes = async (req, res, next) => {
   try {
     const clothes = await clothesModel
       .find()
@@ -15,21 +16,16 @@ const getAllClothes = async (req, res) => {
       data: clothes,
     });
   } catch (error) {
-    res.status(500).send({
-      message: "Error while fetching clothes",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const getOneClothes = async (req, res) => {
-  const { id } = req.params;
-
+const getOneClothes = async (req, res, next) => {
   try {
+    const { id } = req.params;
+
     if (!isValidObjectId(id)) {
-      return res.status(400).send({
-        message: `Given ID: ${id} is not a valid Object ID`,
-      });
+      throw new BaseException(`Given ID: ${id} is not valid Object ID`, 400);
     }
 
     const clothes = await clothesModel
@@ -38,9 +34,7 @@ const getOneClothes = async (req, res) => {
       .select(["-createdAt", "-updatedAt"]);
 
     if (!clothes) {
-      return res.status(404).send({
-        message: "Clothes not found",
-      });
+      throw new BaseException("Clothes not found", 404);
     }
 
     res.send({
@@ -48,23 +42,17 @@ const getOneClothes = async (req, res) => {
       data: clothes,
     });
   } catch (error) {
-    res.status(500).send({
-      message: "Error while fetching the clothes",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const createClothes = async (req, res) => {
-  const { name, price, category, description, imageUrl } = req.body;
-
+const createClothes = async (req, res, next) => {
   try {
-    const foundedCategory = await categoryModel.findById(category);
+    const { name, price, category, description, imageUrl, size } = req.body;
 
+    const foundedCategory = await categoryModel.findById(category);
     if (!foundedCategory) {
-      return res.status(404).send({
-        message: `Category with ID: ${category} not found`,
-      });
+      throw new BaseException(`Category with ID: ${category} not found`, 400);
     }
 
     const clothes = await clothesModel.create({
@@ -73,54 +61,40 @@ const createClothes = async (req, res) => {
       category,
       description,
       imageUrl,
+      size,
     });
 
     await categoryModel.updateOne(
       { _id: category },
-      {
-        $push: {
-          clothes: clothes._id,
-        },
-      }
+      { $push: { clothes: clothes._id } }
     );
 
     res.status(201).send({
-      message: "Clothes created successfully",
+      message: "success",
       data: clothes,
     });
   } catch (error) {
-    res.status(500).send({
-      message: "Error while creating clothes",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const updateClothes = async (req, res) => {
-  const { id } = req.params;
-  const { name, description, price } = req.body;
-
+const updateClothes = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const { name, description, price, size } = req.body;
+
     if (!isValidObjectId(id)) {
-      return res.status(400).send({
-        message: `Given ID: ${id} is not a valid Object ID`,
-      });
+      throw new BaseException(`Given ID: ${id} is not valid Object ID`, 400);
     }
 
     const clothes = await clothesModel.findByIdAndUpdate(
       id,
-      {
-        name,
-        description,
-        price,
-      },
+      { name, description, price, size },
       { new: true }
     );
 
     if (!clothes) {
-      return res.status(404).send({
-        message: "Clothes not found",
-      });
+      throw new BaseException("Clothes not found", 404);
     }
 
     res.send({
@@ -128,40 +102,36 @@ const updateClothes = async (req, res) => {
       data: clothes,
     });
   } catch (error) {
-    res.status(500).send({
-      message: "Error while updating clothes",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const deleteClothes = async (req, res) => {
-  const { id } = req.params;
-
+const deleteClothes = async (req, res, next) => {
   try {
+    const { id } = req.params;
+
     if (!isValidObjectId(id)) {
-      return res.status(400).send({
-        message: `Given ID: ${id} is not a valid Object ID`,
-      });
+      throw new BaseException(`Given ID: ${id} is not valid Object ID`, 400);
     }
 
     const result = await clothesModel.deleteOne({ _id: id });
 
     if (result.deletedCount === 0) {
-      return res.status(404).send({
-        message: "Clothes not found",
-      });
+      throw new BaseException("Clothes not found", 404);
     }
 
-    res.status(204).send({
-      message: "Clothes deleted successfully",
-    });
+    await categoryModel.updateOne({ clothes: id }, { $pull: { clothes: id } });
+
+    res.status(204).send();
   } catch (error) {
-    res.status(500).send({
-      message: "Error while deleting clothes",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export default { getAllClothes, getOneClothes, createClothes, updateClothes, deleteClothes };
+export default {
+  getAllClothes,
+  getOneClothes,
+  createClothes,
+  updateClothes,
+  deleteClothes,
+};

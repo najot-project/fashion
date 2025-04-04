@@ -10,7 +10,7 @@ import {
 // Register Controller
 const register = async (req, res, next) => {
   try {
-    const { name, phoneNumber, password } = req.body;
+    const { name, phoneNumber, password, birthDate, gender } = req.body;
 
     // Check if all fields are provided
     if (!name || !phoneNumber || !password) {
@@ -31,6 +31,8 @@ const register = async (req, res, next) => {
       name,
       phoneNumber,
       password: passwordHash,
+      birthDate,
+      gender,
     });
 
     // Save the new user
@@ -79,12 +81,7 @@ const login = async (req, res, next) => {
     }
 
     // Generate token upon successful login
-    const token = generateToken(
-      user._id,
-      user.phoneNumber,
-      ACCESS_TOKEN_SECRET,
-      ACCESS_TOKEN_EXPIRE_TIME
-    );
+    const token = generateToken(user._id, user.phoneNumber);
 
     // Send response with the token
     res.status(200).json({ message: "Login successful", token });

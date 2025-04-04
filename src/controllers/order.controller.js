@@ -1,75 +1,88 @@
-import Order from "../models/order.model.js"
+import { BaseException } from "../exception/base.exception.js";
+import Order from "../models/order.model.js";
 
-const getOrders = async (req, res) => {
+const getOrders = async (req, res, next) => {
   try {
     const orders = await Order.find().populate("userId orderItems.clothesId");
-    res.status(200).json({message: "Succes", orders});
+    res.status(200).json({ message: "Success", orders });
   } catch (err) {
-    console.log(err.message);
-    
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-const getOrderById = async (req, res) => {
+const getOrderById = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate("userId orderItems.clothesId");
-    if (!order) return res.status(404).json({ message: "Order not found" });
-
-    res.status(200).json({message: "Succes", order});
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-const createOrder = async (req, res) => {
-  try {
-    const { userId, orderItems, total_price } = req.body;
-
-    if (!userId || !orderItems.length || !total_price) {
-      return res.status(400).json({ message: "Invalid data" });
+    if (!order) {
+      throw new BaseException(`Order is not found`);
     }
 
-    const newOrder = new Order({ userId, orderItems, total_price });
-    await newOrder.save();
-
-    res.status(201).json({message: "Succes", newOrder});
+    res.status(200).json({ message: "Success", order });
   } catch (err) {
-    res.status(500).json({ message: err.message});
+    next(err);
   }
 };
 
-const updateOrder = async (req, res) => {
+const createOrder = async (req, res, next) => {
   try {
-    const { id } = req.params; 
-    const updateData = req.body; 
+    const { userId, orderItems } = req.body;
+
+    if (!userId || !orderItems || orderItems.length === 0) {
+      throw new BaseException(`All fields (userId, orderItems) must be provided`);
+    }
+
+    let total_price = 0;
+    for (const item of orderItems) {
+      total_price += item.quantity * item.price; 
+    }
+
+    const newOrder = new Order({
+      userId,
+      orderItems,
+      total_price,
+    });
+
+    await newOrder.save();
+
+    res.status(201).json({ message: "Success", newOrder });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
 
     const updatedOrder = await Order.findByIdAndUpdate(id, updateData, {
-      new: true, 
-      runValidators: true, 
+      new: true,
+      runValidators: true,
     });
 
     if (!updatedOrder) {
-      return res.status(404).json({ message: "Order not found" });
+      throw new BaseException(`Order is not found`);
     }
 
     res.status(200).json({
       message: "Order updated successfully",
       updatedOrder,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+  } catch (err) {
+    next(err);
   }
 };
 
-const deleteOrder = async (req, res) => {
+const deleteOrder = async (req, res, next) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
-    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (!order) {
+      throw new BaseException(`Order is not found`);
+    }
 
     res.status(200).json({ message: "Order deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
