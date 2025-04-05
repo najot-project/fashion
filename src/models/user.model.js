@@ -30,11 +30,11 @@ const userSchema = new Schema(
       type: Date,
       required: true,
     },
-    role:{
+    role: {
       type: String,
-      enum: ["VIEWER", "SUPER_ADMIN","SHOP_OWNER"],
-      default: "VIEWER",
-    }
+      enum: [ROLES.VIEWER, ROLES.RESTAURANT_OWNER, ROLES.SUPER_ADMIN],
+      default: ROLES.VIEWER,
+    },
   },
   {
     collection: "users",
