@@ -35,6 +35,12 @@ const userSchema = new Schema(
       enum: [ROLES.VIEWER, ROLES.RESTAURANT_OWNER, ROLES.SUPER_ADMIN],
       default: ROLES.VIEWER,
     },
+    email: {
+      type: mongoose.SchemaTypes.String,
+      required: true,
+      unique: true,
+      match: /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gim,
+    },
   },
   {
     collection: "users",
