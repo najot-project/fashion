@@ -17,7 +17,7 @@ categoryRouter
 )
 .post("/", 
     Protected(true),
-    Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN), 
+    Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN, ROLES.VIEWER), 
     ValidationMiddleware(createCategorySchema),
      categoryController.createCategory
 )
