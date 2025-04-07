@@ -42,14 +42,14 @@ userRouter.get("/:id",
 userRouter.put(
   "/:id",
   Protected(true),
-  Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN),
+  Roles(ROLES.ALL),
   ValidationMiddleware(updateUserSchema),
   userController.updateUser
 );
 
 userRouter.delete("/:id",
   Protected(true),
-  Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN), 
+  Roles(ROLES.ALL), 
   userController.deleteUser
 );
 
