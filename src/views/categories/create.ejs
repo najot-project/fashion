@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/categories.css">
+    <title>Yangi Kategoriya</title>
+</head>
+<body>
+    <h1>Yangi Kategoriya Qo'shish</h1>
+    <form action="/categories/create" method="POST">
+        <label for="name">Kategoriya nomi:</label>
+        <input type="text" id="name" name="name" required />
+        <br/>
+        <label for="categoryId">Kategoriya (ota-kategoriya):</label>
+        <input type="text" id="categoryId" name="categoryId" />
+        <br/>
+        <button type="submit">Qo'shish</button>
+    </form>
+</body>
+</html>

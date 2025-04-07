@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/categories.css">
+  <title>Kategoriyani tahrirlash</title>
+</head>
+<body>
+  <h1>Kategoriyani tahrirlash</h1>
+
+  <form action="/categories/update" method="POST">
+    <!-- IDni yashirin input sifatida yuborish -->
+    <input type="hidden" name="id" value="KATEGORIYA_ID_BU_YERGA">
+
+    <label for="name">Yangi nom:</label>
+    <input type="text" id="name" name="name" value="HOZIRGI_NOM_BU_YERGA" required>
+
+    <button type="submit">Saqlash</button>
+  </form>
+
+  <a href="/categories">⬅ Orqaga</a>
+</body>
+</html>
