@@ -1,9 +1,13 @@
 import express from "express";
 import route from "./routers/index.js";
 import { config } from "dotenv";
-import { join } from "node:path";
+
+import path from 'path';
+import cookieParser from 'cookie-parser'
+import pageRouter from "./routers/page.route.js";
 import { BaseException } from "./utils/exception.js";
 import { ErrorHandlerMiddleware } from "./middlewares/error.middleware.js";
+
 config();
 
 const app = express();
@@ -11,7 +15,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/uploads", express.static(join(process.cwd(), "uploads")));
+app.set("view engine", "ejs");
+app.set("views", path.join(process.cwd(), "src", "views"));
+app.use("/uploads", express.static("uploads"));
+
+app.use(cookieParser("cookie-secret"));
+
+app.use("/", pageRouter)
 
 app.use("/api", route);
 

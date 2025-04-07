@@ -1,45 +1,56 @@
 import { Router } from "express";
 import userController from "../controllers/user.controller.js";
 import { ValidationMiddleware } from "../middleware/validation.middleware.js";
+import { Protected } from "../middleware/protected.middleware.js"
 import {
   registerUserSchema,
   updateUserSchema,
   loginUserSchema,
 } from "../schema/user.schema.js";
+import { Roles } from "../middleware/roles.middleware.js";
+import { ROLES } from "../constants/role.constants.js";
 
 const userRouter = Router();
 
-// Register route
 userRouter.post(
-  "/register",Protected(false),Roles(ROLES.ALL),
+  "/register",
+  Protected(false),
+  Roles(ROLES.ALL),
   ValidationMiddleware(registerUserSchema),
   userController.register
 );
 
-// Login route
 userRouter.post(
-  "/login",Protected(false),Roles(ROLES.ALL),
+  "/login",
+  Protected(false),
+  Roles(ROLES.ALL),
   ValidationMiddleware(loginUserSchema),
   userController.login
 );
 
-// Get all users
-userRouter.get("/",Protected(true),Roles(ROLES.RESTAURANT_OWNER,ROLES.SUPER_ADMIN), userController.getAllUsers);
-
-// Get user by ID
-userRouter.get(
-  "/:id",Protected(true),Roles(ROLES.RESTAURANT_OWNER,ROLES.SUPER_ADMIN),
-  userController.getOneUser
+userRouter.get("/",
+  Protected(false),
+  Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN),
+  userController.getAllUsers
 );
 
-// Update user by ID
+userRouter.get("/:id",
+  Protected(false),
+  Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN),
+  userController.getOneUser);
+
 userRouter.put(
-  "/:id",Protected(false),Roles(ROLES.ALL),
+  "/:id",
+  Protected(true),
+  Roles(ROLES.ALL),
   ValidationMiddleware(updateUserSchema),
   userController.updateUser
 );
 
-// Delete user by ID
-userRouter.delete("/:id",Protected(false),Roles(ROLES.ALL),userController.deleteUser);
+userRouter.delete("/:id",
+  Protected(true),
+  Roles(ROLES.ALL), 
+  userController.deleteUser
+);
 
 export default userRouter;

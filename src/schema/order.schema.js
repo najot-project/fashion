@@ -1,18 +1,17 @@
 import Joi from "joi";
 
+// Validation Schemas
 export const createOrderSchema = Joi.object({
-  userId: Joi.string().length(24).required(), 
+  userId: Joi.string().length(24).required(),
   orderItems: Joi.array()
     .items(
       Joi.object({
-        clothesId: Joi.string().length(24).required(), 
-        quantity: Joi.number().integer().min(1).required(),
-        price: Joi.number().positive().required(),
+        clothesId: Joi.string().length(24).required(),
+        count: Joi.number().integer().min(1).required(),
       })
     )
-    .min(1) 
+    .min(1)
     .required(),
-  total_price: Joi.number().positive().required(),
 });
 
 export const updateOrderSchema = Joi.object({
@@ -20,10 +19,10 @@ export const updateOrderSchema = Joi.object({
   orderItems: Joi.array().items(
     Joi.object({
       clothesId: Joi.string().length(24),
-      quantity: Joi.number().integer().min(1),
-      price: Joi.number().positive(),
+      count: Joi.number().integer().min(1),
     })
   ),
   total_price: Joi.number().positive(),
-  status: Joi.string().valid('pending', 'shipped', 'delivered', 'cancelled'),
+  status: Joi.string().valid("pending", "shipped", "delivered", "cancelled"),
 });
+
