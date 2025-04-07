@@ -6,7 +6,7 @@ import {
   updateUserSchema,
   loginUserSchema,
 } from "../schema/user.schema.js";
-
+import { Protected } from "../middleware/protected.middleware.js";
 const userRouter = Router();
 
 // Register route

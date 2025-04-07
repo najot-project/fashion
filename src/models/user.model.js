@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+// ROLES obyektini shu yerda aniqlaymiz
+const ROLES = {
+  VIEWER: "VIEWER",
+  RESTAURANT_OWNER: "RESTAURANT_OWNER",
+  SUPER_ADMIN: "SUPER_ADMIN",
+};
+
 const userSchema = new Schema(
   {
     name: {

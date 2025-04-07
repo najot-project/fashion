@@ -2,14 +2,17 @@ import express from "express";
 import route from "./routers/index.js";
 import { config } from "dotenv";
 import { join } from "node:path";
-import { BaseException } from "./utils/exception.js";
-import { ErrorHandlerMiddleware } from "./middlewares/error.middleware.js";
+import { BaseException } from "./exception/base.exception.js"
+import  ErrorHandlerMiddleware  from "./middleware/error.middleware.js";
+
 config();
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser("cookie-secret"));
 
 app.use("/uploads", express.static(join(process.cwd(), "uploads")));
 
