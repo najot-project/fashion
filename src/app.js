@@ -5,8 +5,8 @@ import { config } from "dotenv";
 import path from 'path';
 import cookieParser from 'cookie-parser'
 import pageRouter from "./routers/page.route.js";
-import { BaseException } from "./utils/exception.js";
-import { ErrorHandlerMiddleware } from "./middlewares/error.middleware.js";
+import { BaseException } from "../src/exception/base.exception.js";
+import { ErrorHandlerMiddleware } from "./middleware/error.middleware.js";
 
 config();
 
