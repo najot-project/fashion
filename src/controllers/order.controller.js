@@ -1,8 +1,7 @@
 import { BaseException } from "../exception/base.exception.js";
 import Order from "../models/order.model.js";
-import Clothes from "../models/clothes.model.js"; // Clothes modelini import qilamiz
+import Clothes from "../models/clothes.model.js";
 
-// Controllers
 const getOrders = async (req, res, next) => {
   try {
     const orders = await Order.find()
