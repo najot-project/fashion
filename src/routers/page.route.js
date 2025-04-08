@@ -1,5 +1,6 @@
 import { Router } from "express";
-import clothesModel from "../models/clothes.model";
+import orderModel from "../models/order.model.js";
+
 
 const pageRouter = Router();
 
