@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buyurtmalar</title>
+</head>
+<body>
+  <h1>Foydalanuvchi Buyurtmalari</h1>
+
+  <ul>
+    <% orders.forEach(order => { %>
+      <li>
+        <a href="/orders/<%= order._id %>">
+          Buyurtma ID: <%= order._id %> - Mahsulotlar soni: <%= order.items.length %>
+        </a>
+      </li>
+    <% }) %>
+  </ul>
+
+  <a href="/orders/create">➕ Yangi buyurtma yaratish</a>
+</body>
+</html>
