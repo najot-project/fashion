@@ -6,6 +6,14 @@ pageRouter.get("/", (req, res) => {
     res.render("index");
 });
 
+pageRouter.get("/users/login", (req, res) => {
+    res.render("login");
+});
+
+pageRouter.get("/users/register", (req, res) => {
+    res.render("register");
+});
+
 pageRouter.get("/categories", (req, res) => {
     res.render("categories/index")
 });

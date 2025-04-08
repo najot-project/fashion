@@ -2,8 +2,8 @@ import express from "express";
 import route from "./routers/index.js";
 import { config } from "dotenv";
 
-import path from 'path';
-import cookieParser from 'cookie-parser'
+import path from "path";
+import cookieParser from "cookie-parser";
 import pageRouter from "./routers/page.route.js";
 import { fileURLToPath } from "url";
 
@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser("cookie-secret"));
 
-app.use("/", pageRouter)
+app.use("/", pageRouter);
 
 app.use("/api", route);
 

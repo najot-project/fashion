@@ -1,103 +1,226 @@
-import { isValidObjectId } from "mongoose";
-import bcrypt from "bcrypt";
+import { compare, hash } from "bcrypt";
+import crypto from "node:crypto";
+import jwt from "jsonwebtoken";
 import userModel from "../models/user.model.js";
+import { BaseException } from "../exception/base.exception.js";
 import {
   ACCESS_TOKEN_EXPIRE_TIME,
   ACCESS_TOKEN_SECRET,
-  generateToken,
+  REFRESH_TOKEN_EXPIRE_TIME,
+  REFRESH_TOKEN_SECRET,
 } from "../config/jwt.config.js";
 import { sendMail } from "../utils/mail.ulits.js";
 
-// Cookie options
-const cookieOptions = {
-  httpOnly: true, // JavaScript orqali ko'rinmasin
-  secure: process.env.NODE_ENV === "production", // faqat HTTPSda ishlaydi
-  maxAge: ACCESS_TOKEN_EXPIRE_TIME * 1000, // millisecondlarda
-  sameSite: "strict",
-};
-
-// Register Controller
 const register = async (req, res, next) => {
   try {
-    const { name, phoneNumber, password, birthDate, gender, role, email } = req.body;
+    const { name, email, phoneNumber, password } = req.body;
 
-    if (!name || !phoneNumber || !password || !email) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    const existingUser = await userModel.findOne({
+      $or: [{ email }, { phoneNumber }],
+    });
 
-    const existingUser = await userModel.findOne({ phoneNumber });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists with this phone number" });
+      return res.render("register", {
+        error: "Email yoki telefon raqam allaqachon ro'yxatdan o'tgan",
+      });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const newUser = new userModel({
+    const passwordHash = await hash(password, 10);
+    const newUser = await userModel.create({
       name,
+      email,
       phoneNumber,
       password: passwordHash,
-      birthDate,
-      gender,
-      role: role || "VIEWER",
-      email,
     });
 
-    await newUser.save();
-
-    const token = generateToken(
-      newUser._id,
-      newUser.phoneNumber,
-      newUser.role,
-      ACCESS_TOKEN_SECRET,
-      ACCESS_TOKEN_EXPIRE_TIME
-    );
-
-    // Send token via Cookie
-    res.cookie("access_token", token, cookieOptions);
-
-    // Send Welcome Email
     await sendMail({
-      to: newUser.email,
+      to: email,
       subject: "Xush kelibsiz!",
-      html: `Salom, ${newUser.name}, Sizni ro'yhatdan o'tganingiz bilan tabriklaymiz!`,
+      text: `Salom ${name}! Fashion loyihamizga muvaffaqiyatli ro'yxatdan o'tdingiz.`,
     });
 
-    res.status(201).json({
-      message: "User registered successfully and welcome email sent",
-      data: newUser,
-    });
+    return res.redirect("/users/login");
   } catch (error) {
-    console.error(error);
     next(error);
   }
 };
 
-// Login Controller
 const login = async (req, res, next) => {
   try {
-    const { phoneNumber, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!phoneNumber || !password) {
-      return res.status(400).json({ message: "Phone number and password are required" });
-    }
-
-    const user = await userModel.findOne({ phoneNumber });
+    const user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.render("login", { error: "Foydalanuvchi topilmadi" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid credentials" });
+    const isMatch = await compare(password, user.password);
+    if (!isMatch) {
+      return res.render("login", { error: "Noto'g'ri parol" });
     }
 
-    const token = generateToken(user._id, user.phoneNumber, user.role);
+    const accessToken = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, {
+      expiresIn: +ACCESS_TOKEN_EXPIRE_TIME,
+      algorithm: "HS256",
+    });
 
-    // Send token via Cookie
-    res.cookie("access_token", token, cookieOptions);
+    const refreshToken = jwt.sign({ id: user.id, role: user.role }, REFRESH_TOKEN_SECRET, {
+      expiresIn: +REFRESH_TOKEN_EXPIRE_TIME,
+      algorithm: "HS256",
+    });
 
-    res.status(200).json({ message: "Login successful" });
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: +ACCESS_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: +REFRESH_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.cookie("user", JSON.stringify(user));
+
+    return res.redirect("/");
   } catch (error) {
-    console.error(error);
     next(error);
   }
+};
+
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.render("forgot-password", {
+        error: "Foydalanuvchi topilmadi",
+        message: null,
+      });
+    }
+
+    const token = crypto.randomBytes(50).toString("hex");
+    user.token = token;
+    await user.save();
+
+    const resetLink = `http://localhost:3000/users/reset-password?token=${token}`;
+
+    await sendMail({
+      to: email,
+      subject: "Parolni tiklash",
+      html: `
+        <h2>Parolni tiklash uchun quyidagi linkni bosing:</h2>
+        <a href="${resetLink}">Parolni tiklash</a>
+      `,
+    });
+
+    res.render("forgot-password", {
+      message: "Emailga tiklash havolasi yuborildi!",
+      error: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.query;
+
+    if (!token) {
+      return res.redirect("/users/login");
+    }
+
+    const user = await userModel.findOne({ token });
+    if (!user) {
+      return res.redirect("/users/forgot-password");
+    }
+
+    const passwordHash = await hash(password, 10);
+    user.password = passwordHash;
+    user.token = null;
+
+    await user.save();
+
+    res.render("reset-password", {
+      message: "Parolingiz muvaffaqiyatli yangilandi",
+      error: null,
+      token: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const refresh = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    const data = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+
+    const newAccessToken = jwt.sign(data, ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXPIRE_TIME,
+      algorithm: "HS256",
+    });
+
+    const newRefreshToken = jwt.sign(data, REFRESH_TOKEN_SECRET, {
+      expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
+      algorithm: "HS256",
+    });
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      maxAge: +ACCESS_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      maxAge: +REFRESH_TOKEN_EXPIRE_TIME * 1000,
+    });
+
+    res.send({
+      message: "Tokenlar yangilandi",
+      tokens: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    });
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      next(new BaseException("Refresh token muddati tugagan", 401));
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      next(new BaseException("Noto'g'ri refresh token", 400));
+    } else {
+      next(error);
+    }
+  }
+};
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await userModel.find().populate({
+      path: "orders",
+      populate: {
+        path: "orderItems",
+        populate: "food",
+      },
+    });
+
+    res.send({
+      message: "Foydalanuvchilar ro'yxati",
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+  refresh,
+  getAllUsers,
 };
