@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Yangi Buyurtma</title>
+</head>
+<body>
+  <h1>Yangi Buyurtma Yaratish</h1>
+
+  <form action="/orders" method="POST">
+    <label for="product">Kiyim tanlang:</label>
+    <select name="productId" id="product">
+      <% products.forEach(product => { %>
+        <option value="<%= product._id %>"><%= product.name %></option>
+      <% }) %>
+    </select>
+
+    <label for="quantity">Miqdor:</label>
+    <input type="number" name="quantity" id="quantity" value="1" min="1" required>
+
+    <button type="submit">✅ Buyurtma berish</button>
+  </form>
+
+  <a href="/orders">🔙 Buyurtmalar ro‘yxatiga qaytish</a>
+</body>
+</html>
