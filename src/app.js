@@ -26,14 +26,7 @@ app.use("/", pageRouter);
 app.use("/api", route);
 
 app.all("/*", (req, res, next) => {
-  try {
-    throw new BaseException(
-      `Given ${req.url} with method: ${req.method} not found`,
-      404
-    );
-  } catch (error) {
-    next(error);
-  }
+  res.render("404")
 });
 
 app.use(ErrorHandlerMiddleware);
