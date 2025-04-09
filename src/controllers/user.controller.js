@@ -10,9 +10,13 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "../config/jwt.config.js";
 import { sendMail } from "../utils/mail.ulits.js";
+import { error, log } from "node:console";
+import e from "express";
 
 const register = async (req, res, next) => {
   try {
+  
+    
     const { name, email, phoneNumber, password } = req.body;
 
     const existingUser = await userModel.findOne({
@@ -33,14 +37,19 @@ const register = async (req, res, next) => {
       password: passwordHash,
     });
 
-    await sendMail({
-      to: email,
-      subject: "Xush kelibsiz!",
-      text: `Salom ${name}! Fashion loyihamizga muvaffaqiyatli ro'yxatdan o'tdingiz.`,
-    });
+    // await sendMail({
+    //   to: email,
+    //   subject: "Xush kelibsiz!",
+    //   text: `Salom ${name}! Fashion loyihamizga muvaffaqiyatli ro'yxatdan o'tdingiz.`,
+    // });
+    
+   
+    
 
     return res.redirect("/users/login");
   } catch (error) {
+    console.log(error);
+    
     next(error);
   }
 };
@@ -51,23 +60,31 @@ const login = async (req, res, next) => {
 
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.render("login", { error: "Foydalanuvchi topilmadi" });
+      return res.render("auth/login", { error: "Foydalanuvchi topilmadi" });
     }
 
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
-      return res.render("login", { error: "Noto'g'ri parol" });
+      return res.render("auth/login", { error: "Noto'g'ri parol" });
     }
 
-    const accessToken = jwt.sign({ id: user.id, role: user.role }, ACCESS_TOKEN_SECRET, {
-      expiresIn: +ACCESS_TOKEN_EXPIRE_TIME,
-      algorithm: "HS256",
-    });
+    const accessToken = jwt.sign(
+      { id: user.id, role: user.role },
+      ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: +ACCESS_TOKEN_EXPIRE_TIME,
+        algorithm: "HS256",
+      }
+    );
 
-    const refreshToken = jwt.sign({ id: user.id, role: user.role }, REFRESH_TOKEN_SECRET, {
-      expiresIn: +REFRESH_TOKEN_EXPIRE_TIME,
-      algorithm: "HS256",
-    });
+    const refreshToken = jwt.sign(
+      { id: user.id, role: user.role },
+      REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: +REFRESH_TOKEN_EXPIRE_TIME,
+        algorithm: "HS256",
+      }
+    );
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -127,8 +144,6 @@ const resetPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
     const { token } = req.query;
-    console.log(token);
-    
 
     if (!token) {
       return res.redirect("/users/login");

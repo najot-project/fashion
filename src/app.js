@@ -22,7 +22,7 @@ app.use(cookieParser("cookie-secret"));
 
 app.use("/", pageRouter);
 
-app.use("/api", route);
+app.use("/", route);
 
 app.all("/*", (req, res, next) => {
   res.render("404");

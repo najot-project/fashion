@@ -23,7 +23,7 @@ userRouter
     "/register",
     Protected(false),
     Roles(ROLES.ALL),
-    ValidationMiddleware(registerSchema),
+    // ValidationMiddleware(registerSchema),
     userController.register
   )
   .post(

@@ -20,7 +20,15 @@ pageRouter.get("/users/forgot-password", (req, res) => {
 });
 
 pageRouter.get("/users/reset-password", (req, res) => {
-  res.render("auth/reset-password", { error: null, message: null, token });
+  const token = req.query.token;
+  if (!token) {
+    res.redirect("/users/login");
+  }
+  res.render("auth/reset-password", {
+    error: null,
+    message: null,
+    token,
+  });
 });
 
 pageRouter.get("/orders", (req, res) => {
