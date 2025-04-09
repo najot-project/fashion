@@ -50,6 +50,5 @@ pageRouter.get("/orders", (req, res) => {
       });
     }
   });
-  
-  
+
 export default pageRouter;
