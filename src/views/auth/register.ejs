@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign up</title>
+  </head>
+  <body>
+    <h1>SIGN UP</h1>
+    <h4 style="color: red"><%= error %></h4>
+
+    <a href="/users/login">Already have account? Login...</a>
+      <br /><br>
+    <form action="/users/register" method="post">
+      <input type="text" name="name" placeholder="name" />
+      <br /><br />
+
+      <input type="text" name="phoneNumber" placeholder="phoneNumber" />
+      <br /><br />
+
+      <input type="email" name="email" placeholder="email" />
+      <br /><br />
+
+      <input type="text" name="password" placeholder="password" />
+      <br /><br />
+
+      <input type="text" name="password" placeholder="password" />
+      <br /><br />
+
+      <input type="date" name="birthDate" placeholder="birthDate" />
+      <br /><br />
+
+      <label for="gender">
+        <input type="radio" name="gender" value="male" /> Erkak
+        <input type="radio" name="gender" value="female" /> Ayol
+      </label>
+      <br /><br />
+      <button type="submit">send</button>
+    </form>
+  </body>
+</html>
