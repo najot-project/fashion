@@ -12,6 +12,10 @@ const userSchema = new Schema(
       maxlength: 50,
       trim: true,
     },
+    token: {
+      type: String,
+      required: false,
+    },
     email: {
       type: String,
       required: true,

@@ -127,6 +127,8 @@ const resetPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
     const { token } = req.query;
+    console.log(token);
+    
 
     if (!token) {
       return res.redirect("/users/login");
