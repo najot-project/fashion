@@ -1,27 +1,35 @@
 import { Router } from "express";
 import orderModel from "../models/order.model.js";
 
-
 const pageRouter = Router();
 
 pageRouter.get("/", (req, res) => {
-    res.render("index");
+  res.render("index");
 });
 
-pageRouter.get("/orders", async (req, res, next) => {
-      res.render("orders/index", { orders });
-})
+pageRouter.get("/orders", (req, res) => {
+    res.render("orders/index", {
+      orders: [],
+      error: null,
+      success: null,
+    });
+  });
   
-
-  pageRouter.get("/orders/create", async (req, res, next) => { 
-      res.render("orders/create", { clothes });
-})
+  pageRouter.get("/orders/create", (req, res) => {
+    res.render("orders/create", {
+      clothes: [],
+      error: null,
+      success: null,
+    });
+  });
   
-  pageRouter.get("/orders/:id", async (req, res, next) => {
-        const { id } = req.params;
-        const order = await orderModel.findById(id);
-        res.render("orders/show", { order });
-    }
-   )
-
+  pageRouter.get("/orders/:id", (req, res) => {
+    const order = null; // keyinchalik DB'dan olib kelinadi
+    res.render("orders/show", {
+      order,
+      error: null,
+      success: null,
+    });
+  });
+  
 export default pageRouter;
