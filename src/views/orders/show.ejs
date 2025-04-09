@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buyurtma tafsilotlari</title>
+</head>
+<body>
+  <h1>Buyurtma ID: <%= order._id %></h1>
+
+  <ul>
+    <% order.items.forEach(item => { %>
+      <li>
+        Kiyim: <%= item.product.name %> – Miqdor: <%= item.quantity %>
+      </li>
+    <% }) %>
+  </ul>
+
+  <a href="/orders">🔙 Orqaga</a>
+</body>
+</html>

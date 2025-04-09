@@ -5,7 +5,6 @@ import { config } from "dotenv";
 import path from "path";
 import cookieParser from "cookie-parser";
 import pageRouter from "./routers/page.route.js";
-import { BaseException } from "./exception/base.exception.js";
 import { ErrorHandlerMiddleware } from "./middleware/error.middleware.js";
 
 config();
@@ -26,7 +25,7 @@ app.use("/", pageRouter);
 app.use("/api", route);
 
 app.all("/*", (req, res, next) => {
-  res.render("404")
+  res.render("404");
 });
 
 app.use(ErrorHandlerMiddleware);
