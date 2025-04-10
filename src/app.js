@@ -28,9 +28,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser("cookie-secret"));
 
-app.use("/", pageRouter);
-
 app.use("/api", route);
+app.use("/", pageRouter);
 
 app.all("/*", (req, res, next) => {
   res.render("404");

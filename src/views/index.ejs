@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="stylesheet" href="styles/home.css">
 </head>
 <body>
     <h1>Asosiy sahifa</h1>
 
-    
+    <h2>Kategoriyalar:</h2>
+    <ul>
+        <% categories.forEach(cat => { %>
+            <li>
+                <a href="/?category=<%= cat.id %>" style="<%= cat.isActive ? 'font-weight: bold;' : '' %>">
+                    <%= cat.name %>
+                </a>
+            </li>
+        <% }) %>
+    </ul>
+
+    <%- include('partials/categories', { categoryName: categoryName, subcategories: subcategories }) %>
 </body>
 </html>
