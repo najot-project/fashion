@@ -40,14 +40,6 @@ pageRouter.get("/orders", (req, res) => {
     });
   });
   
-  pageRouter.get("/orders/create", (req, res) => {
-    res.render("orders/create", {
-      clothes: [],
-      error: null,
-      success: null,
-    });
-  });
-  
   pageRouter.get("/orders/:id", async (req, res) => {
     const { id } = req.params;
     
