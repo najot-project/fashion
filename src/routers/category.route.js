@@ -33,8 +33,8 @@ categoryRouter
     categoryController.updateCategory
 )
 .delete("/:id",
-    Protected(true),
-    Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN), 
+        Protected(true),
+        Roles(ROLES.STORE_OWNER, ROLES.SUPER_ADMIN), 
     categoryController.deleteCategory)
 
 
