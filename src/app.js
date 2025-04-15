@@ -1,6 +1,7 @@
 import express from "express";
 import route from "./routers/index.js";
 import { config } from "dotenv";
+import session from 'express-session';
 
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -12,6 +13,7 @@ import methodOverride from "method-override";
 import morgan from "morgan";
 
 
+
 config();
 
 const app = express();
@@ -19,6 +21,7 @@ const app = express();
 if(process.env.NODE_ENV?.trim() === "development") {
   app.use(morgan("tiny"));
 }
+
 
 app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
@@ -38,6 +41,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser("cookie-secret"));
 
 
+
+
 app.use("/api", route);
 app.use("/", pageRouter);
 app.use("/", pageRouter);
@@ -46,6 +51,7 @@ app.use("/", route);
 app.all("/*", (req, res, next) => {
   res.render("404");
 });
+
 
 app.use(ErrorHandlerMiddleware);
 

@@ -1,46 +1,171 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Buyurtma tafsilotlari</title>
+  <title>Cart | ZARA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+ body {
+  background: linear-gradient(to right, #D3CCE3, #E9E4F0); 
+  color: #000; 
+  font-family:'Times New Roman', Times, serif; 
+}
+
+a {
+  text-decoration: none; 
+}
+
+    .header {
+      border-bottom: 1px solid #ddd;
+    }
+    .header .logo {
+      font-size: 1.75rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+     
+    }
+    .header .menu-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+    .header .nav-link {
+      text-transform: uppercase;
+      color: #000;
+    }
+    .header .nav-link:hover {
+      text-decoration: underline;
+    }
+
+
+    .cart-title {
+      font-size: 1.5rem;
+      margin: 2rem 0 1.5rem;
+      text-align: center;
+    }
+
+
+    .cart-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-item img {
+      width: 100%;
+      max-width: 120px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .item-info h5 {
+      margin-bottom: 0.25rem;
+      font-size: 1.1rem;
+    }
+    .item-info p {
+      margin: 0.1rem 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .item-total {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    /* === Summary & Button === */
+    .cart-summary {
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 1.5rem;
+    }
+    .checkout-btn {
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 1rem;
+      padding: 0.75rem;
+    }
+
+    /* === Empty Cart === */
+    .empty-cart {
+      text-align: center;
+      margin: 3rem 0;
+    }
+    .empty-cart h4 {
+      margin-bottom: 1rem;
+    }
+
+    /* === Footer === */
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      margin: 3rem 0 1rem;
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
 
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
+  <!-- HEADER -->
+  <header class="header py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="menu-toggle">☰</div>
+      <div class="logo">ZARA</div>
+      <nav>
+        <a href="/" class="nav-link me-3">Home</a>
+        <a href="/clothes" class="nav-link me-3">Clothes</a>
+        <a href="/users/login" class="nav-link">Login</a>
+      </nav>
+    </div>
+  </header>
 
-        <div class="card shadow-sm rounded-4">
-          <div class="card-body">
-            <% if (order) { %> <!-- Check if order exists -->
-              <h3 class="card-title text-center text-primary mb-4">
-                🧾 Buyurtma ID: <%= order._id %>
-              </h3>
 
-              <ul class="list-group mb-4">
-                <% order.items.forEach(item => { %>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    👗 <strong><%= item.product.name %></strong>
-                    <span class="badge bg-secondary rounded-pill">Miqdor: <%= item.quantity %></span>
-                  </li>
-                <% }) %>
-              </ul>
-            <% } else { %> <!-- If no order exists -->
-              <h3 class="text-center text-danger">Buyurtma topilmadi</h3>
-            <% } %>
+  <main class="container">
+    <h2 class="cart-title">Your Shopping Cart</h2>
 
-            <div class="text-center">
-              <a href="/orders" class="btn btn-outline-primary">🔙 Buyurtmalar ro‘yxatiga qaytish</a>
-            </div>
-
+    <% if (orders && orders.length > 0) { %>
+      <% let total = 0; %>
+      <% orders.forEach(order => { 
+           const lineTotal = order.cloth.price * order.quantity;
+           total += lineTotal;
+      %>
+        <div class="cart-item row align-items-center">
+          <div class="col-4 col-md-2">
+            <img src="<%= order.cloth.imageUrl %>" alt="<%= order.cloth.name %>">
+          </div>
+          <div class="col-8 col-md-7 item-info">
+            <h5><%= order.cloth.name %></h5>
+            <p class="text-muted">Category: <%= order.cloth.category.name || order.cloth.category %></p>
+            <p>Price: $<%= order.cloth.price.toFixed(2) %></p>
+            <p>Quantity: <%= order.quantity %></p>
+          </div>
+          <div class="col-12 col-md-3 text-md-end item-total">
+            $<%= lineTotal.toFixed(2) %>
           </div>
         </div>
+      <% }); %>
 
+      <div class="cart-summary">
+        Total: $<%= total.toFixed(2) %>
       </div>
-    </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <form action="/orders/checkout" method="POST">
+        <button type="submit" class="btn btn-dark checkout-btn">Buy!</button>
+      </form>
+
+    <% } else { %>
+      <div class="empty-cart">
+        <h4>Your cart is empty</h4>
+        <p class="text-muted">Added items will appear here </p>
+        <a href="/" class="btn btn-outline-dark mt-3">Continue Shopping</a>
+      </div>
+    <% } %>
+  </main>
+
+
+  <footer class="footer">
+    © 2025 ZARA. All rights reserved.
+  </footer>
 </body>
 </html>
